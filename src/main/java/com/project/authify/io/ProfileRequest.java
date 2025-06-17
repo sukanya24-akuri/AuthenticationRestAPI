@@ -2,6 +2,8 @@ package com.project.authify.io;
 
 import jakarta.persistence.Column;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -15,10 +17,10 @@ import lombok.NoArgsConstructor;
 @Data
 public class ProfileRequest
 {
-    @NotNull(message = "name should not be blank")
+    @NotBlank(message = "name should not be blank")
     private String name;
     @NotNull(message = "email already exists")
-    @Column(unique = true)
+   @Email(message = "enter valid email")
     private String email;
     @Size(min = 6,message = "password altest 6 characters")
     private String password;
