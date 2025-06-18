@@ -19,9 +19,11 @@ public class ProfileRequest
 {
     @NotBlank(message = "name should not be blank")
     private String name;
-    @NotNull(message = "email already exists")
-   @Email(message = "enter valid email")
+
+    @NotNull(message = "Email should not be blank")
+    @Email(message = "enter valid email")
     private String email;
-    @Size(min = 6,message = "password altest 6 characters")
+
+    @Size(min = 6,message = "password atleast 6 characters")
     private String password;
 }

@@ -2,15 +2,22 @@ package com.project.authify.controller;
 
 
 import com.project.authify.io.AuthRequest;
+import com.project.authify.io.AuthResponse;
+import com.project.authify.service.AppUserDetailsService;
+import com.project.authify.util.JwtToken;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,13 +28,27 @@ import java.util.Map;
 public class AuthController
 {
 
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
+    private final AppUserDetailsService appUserDetailsService;
+    private  final JwtToken jwtToken;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthRequest request)
     {
         try {
             authenticate(request.getEmail(), request.getPassword());
+            UserDetails userDetails=appUserDetailsService.loadUserByUsername(request.getEmail());
+         String jwttoken=  jwtToken.generateToken(userDetails);
+            ResponseCookie cookie=ResponseCookie.from("jwt",jwttoken)
+                    .path("/")
+                    .httpOnly(true)
+                    .maxAge(Duration.ofDays(1))
+                    .sameSite("Strict")
+                    .build();
+            return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE,cookie.toString())
+                    .body(new AuthResponse(request.getEmail(),jwttoken));
+
+
         } catch (BadCredentialsException e) {
 
             return buildErrorResponse("email or password incorrect", HttpStatus.BAD_REQUEST);
@@ -37,10 +58,7 @@ public class AuthController
         } catch (Exception e) {
             return buildErrorResponse("authorization failed", HttpStatus.UNAUTHORIZED);
         }
-        Map<String, Object> success = new HashMap<>();
-        success.put("error", false);
-        success.put("message", "login successful");
-        return ResponseEntity.ok(success);
+
 
     }
     private ResponseEntity<Map<String, Object>> buildErrorResponse(String message, HttpStatus status)

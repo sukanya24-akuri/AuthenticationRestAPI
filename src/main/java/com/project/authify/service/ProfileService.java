@@ -4,20 +4,25 @@ import com.project.authify.entity.UserEntity;
 import com.project.authify.io.ProfileRequest;
 import com.project.authify.io.ProfileResponse;
 import com.project.authify.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 
 import java.util.UUID;
 
+
+@RequiredArgsConstructor
 @Service
 public class ProfileService implements IProfileService
 {
 
-    @Autowired
-    private UserRepository repo;
+
+    private final UserRepository repo;
+    private  final PasswordEncoder passwordEncoder;
 
     @Override
     public ProfileResponse createProfile(ProfileRequest request) {
@@ -35,7 +40,7 @@ public class ProfileService implements IProfileService
         return UserEntity.builder()
                 .name(request.getName())
                 .email(request.getEmail())
-                .password(request.getPassword())
+                .password(passwordEncoder.encode(request.getPassword()))
                 .isverifired(false)
                 .resetOtp(null)
                 .resetOtpExpireAt(0L)

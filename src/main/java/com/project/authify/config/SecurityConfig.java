@@ -29,7 +29,7 @@ import java.util.List;
 public class SecurityConfig
 {
 
-    private AppUserDetailsService appUserDetailsService;
+    private final AppUserDetailsService appUserDetailsService;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.cors(Customizer.withDefaults())
@@ -65,6 +65,7 @@ public class SecurityConfig
         return url;
     }
 
+    @Bean
     public AuthenticationManager authenticationManager()
     {
         DaoAuthenticationProvider dao=new DaoAuthenticationProvider();

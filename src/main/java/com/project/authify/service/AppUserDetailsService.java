@@ -10,12 +10,12 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
+
 public class AppUserDetailsService  implements UserDetailsService
 {
-    private UserRepository repo;
+    private final UserRepository repo;
 
 
     @Override
