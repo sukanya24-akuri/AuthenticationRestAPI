@@ -1,5 +1,6 @@
 package com.project.authify.util;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
@@ -8,9 +9,10 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 @Component
-public class JwtToken
+public class JwtUtil
 {
     @Value("${jwt.secret.key}")
     private String SECRET_KEY;
@@ -31,4 +33,42 @@ public class JwtToken
           .signWith(SignatureAlgorithm.HS256,SECRET_KEY)
           .compact();
     }
+
+
+    public Claims extractAllClaims(String token)
+    {
+       return Jwts.parser()
+                .setSigningKey(SECRET_KEY)
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
+   public  <T> T extractClaim(String token, Function<Claims,T> claimReslover)
+   {
+       Claims claims=extractAllClaims(token);
+       return claimReslover.apply(claims);
+   }
+
+
+    public String  extractEmail(String token)
+    {
+        return  extractClaim(token,Claims::getSubject);
+    }
+
+
+    public Date extractExpiration(String token)
+    {
+        return extractClaim(token,Claims::getExpiration);
+    }
+
+    public Boolean isTokenExpiration(String token)
+    {
+        return extractExpiration(token).before(new Date());
+    }
+
+    public Boolean validateToken(String token,UserDetails userDetails)
+    {
+        return (token.equals(userDetails) && !isTokenExpiration(token));
+    }
+
 }
