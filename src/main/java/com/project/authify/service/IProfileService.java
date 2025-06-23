@@ -6,4 +6,5 @@ import com.project.authify.io.ProfileResponse;
 public interface IProfileService
 {
     ProfileResponse createProfile(ProfileRequest request);
+    ProfileResponse getProfile(String email);
 }

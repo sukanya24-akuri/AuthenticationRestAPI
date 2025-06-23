@@ -9,10 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.CurrentSecurityContext;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,5 +25,11 @@ public class UserController
     {
         ProfileResponse result=service.createProfile(request);
         return  new ResponseEntity<>(result, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/profile")
+    public ProfileResponse readProfile(@CurrentSecurityContext(expression = "authentication?.name") String email)
+    {
+        return  service.getProfile(email);
     }
 }
