@@ -41,7 +41,8 @@ public class SecurityConfig
                 .authorizeHttpRequests(auth -> auth.requestMatchers("/login","/register").permitAll().anyRequest().authenticated())
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .logout(AbstractHttpConfigurer::disable)
-                .addFilterBefore(jwtFilterRequest, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtFilterRequest, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(ex->ex.authenticationEntryPoint(customException));
 
         return http.build();
     }
