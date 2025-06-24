@@ -7,4 +7,5 @@ public interface IProfileService
 {
     ProfileResponse createProfile(ProfileRequest request);
     ProfileResponse getProfile(String email);
+    public void sendOtp(String email);
 }

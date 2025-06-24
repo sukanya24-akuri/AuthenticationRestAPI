@@ -14,6 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 
 @RequiredArgsConstructor
@@ -24,6 +25,7 @@ public class ProfileService implements IProfileService
 
     private final UserRepository repo;
     private  final PasswordEncoder passwordEncoder;
+    private  final EmailSenderService emailSenderService;
 
     @Override
     public ProfileResponse createProfile(ProfileRequest request) {
@@ -41,6 +43,32 @@ public class ProfileService implements IProfileService
       UserEntity existingUser=  repo.findByEmail(email)
               .orElseThrow(()->new UsernameNotFoundException("user not found"+email));
      return convertToProfileResponse(existingUser);
+    }
+
+    @Override
+    public void sendOtp(String email)
+    {
+       UserEntity existingUser= repo.findByEmail(email).orElseThrow(()->new UsernameNotFoundException("user not found"));
+
+       //6 digit opt
+     String otp=   String.valueOf(ThreadLocalRandom.current().nextInt(100000,1000000));
+        //otp expiration
+
+      long expireOtp=  System.currentTimeMillis()+(15*60*1000);
+      //update the otp to user
+      existingUser.setResetOtp(otp);
+      existingUser.setResetOtpExpireAt(expireOtp);
+      repo.save(existingUser);
+      try
+      {
+//sent to email otp
+          emailSenderService.sendOtpMail(existingUser.getEmail(), otp);
+      } catch (RuntimeException e)
+      {
+          e.getMessage();
+      }
+
+
     }
 
     private UserEntity convertToEntity(ProfileRequest request)

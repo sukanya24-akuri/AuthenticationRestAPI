@@ -4,6 +4,7 @@ package com.project.authify.controller;
 import com.project.authify.io.AuthRequest;
 import com.project.authify.io.AuthResponse;
 import com.project.authify.service.AppUserDetailsService;
+import com.project.authify.service.ProfileService;
 import com.project.authify.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -17,6 +18,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Duration;
 import java.util.HashMap;
@@ -32,6 +34,7 @@ public class AuthController
     private final AuthenticationManager authenticationManager;
     private final AppUserDetailsService appUserDetailsService;
     private  final JwtUtil jwtUtil;
+    private  final ProfileService profileService;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthRequest request)
@@ -74,8 +77,22 @@ public class AuthController
         {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
         }
-
-
+@GetMapping("isAuthify")
+public ResponseEntity<Boolean> isAuthenticated(@CurrentSecurityContext(expression = "authentication?.name") String email)
+{
+    return ResponseEntity.ok(email != null);
+}
+@PostMapping("/send-otp-email")
+public void sendOtpEmail(@RequestParam String mail)
+{
+    try {
+        profileService.sendOtp(mail);
+    }
+    catch (Exception e)
+    {
+        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,e.getMessage());
+    }
+}
 
     }
 

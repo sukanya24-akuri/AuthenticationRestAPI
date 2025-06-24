@@ -2,6 +2,7 @@ package com.project.authify.controller;
 
 import com.project.authify.io.ProfileRequest;
 import com.project.authify.io.ProfileResponse;
+import com.project.authify.service.EmailSenderService;
 import com.project.authify.service.IProfileService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,11 +20,13 @@ public class UserController
 {
 
     private  final IProfileService service;
+    private  final EmailSenderService emailSenderService;
 
 @PostMapping("/register")
     public ResponseEntity<?> saveProfileData( @Valid @RequestBody ProfileRequest request)
     {
         ProfileResponse result=service.createProfile(request);
+        emailSenderService.sendMessage(result.getEmail(),result.getName());
         return  new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
