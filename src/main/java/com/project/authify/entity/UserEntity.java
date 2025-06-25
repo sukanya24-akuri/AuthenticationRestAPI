@@ -26,9 +26,9 @@ import java.sql.Timestamp;
         @Column(unique = true)
         private String email;
         private String password;
-        private String verifyOpt;
-        private Boolean isverifired;
-        private Long verifyotpExpireAt;
+        private String verifyOtp;
+        private Boolean isAccountverified;
+        private Long verifyOtpExpireAt;
         private String resetOtp;
         private Long resetOtpExpireAt;
 

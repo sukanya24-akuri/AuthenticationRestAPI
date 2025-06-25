@@ -7,5 +7,9 @@ public interface IProfileService
 {
     ProfileResponse createProfile(ProfileRequest request);
     ProfileResponse getProfile(String email);
-    public void sendOtp(String email);
+    void sendOtp(String email);
+    void setPassowordWithOtp(String email,String otp,String newPassword);
+    void sendOtpToEmail(String email);
+    void verifyOtp(String email,String otp);
+
 }

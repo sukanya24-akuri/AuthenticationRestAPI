@@ -3,6 +3,7 @@ package com.project.authify.controller;
 
 import com.project.authify.io.AuthRequest;
 import com.project.authify.io.AuthResponse;
+import com.project.authify.io.ResetPasswordRequest;
 import com.project.authify.service.AppUserDetailsService;
 import com.project.authify.service.ProfileService;
 import com.project.authify.util.JwtUtil;
@@ -83,10 +84,10 @@ public ResponseEntity<Boolean> isAuthenticated(@CurrentSecurityContext(expressio
     return ResponseEntity.ok(email != null);
 }
 @PostMapping("/send-otp-email")
-public void sendOtpEmail(@RequestParam String mail)
+public void sendOtpEmail(@RequestParam String email)
 {
     try {
-        profileService.sendOtp(mail);
+        profileService.sendOtp(email);
     }
     catch (Exception e)
     {
@@ -94,6 +95,45 @@ public void sendOtpEmail(@RequestParam String mail)
     }
 }
 
+@PostMapping("reset-password")
+public void resetPasswordWithOtp(@RequestBody ResetPasswordRequest request)
+{
+    try
+    {
+      profileService.setPassowordWithOtp(request.getEmail(),request.getOtp(),request.getNewPassword());
+    }
+    catch (Exception e)
+    {
+        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,e.getMessage());
+    }
+}
+@PostMapping("/send-otp")
+public  void sendOtpToEmail(@CurrentSecurityContext(expression ="authentication?.name") String email)
+{
+    try
+    {
+        profileService.sendOtpToEmail(email);
+    }
+    catch (Exception e)
+    {
+        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"user not found ");
+    }
+
+}
+@PostMapping("/verify-otp")
+public  void verifyEmail(@RequestBody Map<String,Object> map, @CurrentSecurityContext(expression = "authentication?.name") String email)
+{
+    if (map.get("otp").toString()==null) {
+        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"incorrect opt");
+    }
+    try
+    {
+        profileService.verifyOtp(email,map.get("otp").toString());
+    }catch (Exception e)
+    {
+        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"account is not verified");
+    }
+}
     }
 
 
