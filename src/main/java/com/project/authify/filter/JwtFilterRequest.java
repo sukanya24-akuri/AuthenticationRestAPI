@@ -25,15 +25,15 @@ public class JwtFilterRequest extends OncePerRequestFilter {
     private final AppUserDetailsService appUserDetailsService;
     private final JwtUtil jwtUtil;
 
-    private static final List<String> PUBLIC_URLS = List.of("/login","/register","/reset-password");
+    private static final List<String> PUBLIC_URLS = List.of("/login", "/register", "/reset-password");
 
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String path = request.getServletPath();
 
-        if(PUBLIC_URLS.contains(path)){
-            filterChain.doFilter(request,response);
+        if (PUBLIC_URLS.contains(path)) {
+            filterChain.doFilter(request, response);
             return;
         }
 
@@ -42,16 +42,16 @@ public class JwtFilterRequest extends OncePerRequestFilter {
 
         //check the authorization headers
         final String authorizationHeader = request.getHeader("Authorization");
-        if(authorizationHeader != null && authorizationHeader.startsWith("Bearer ")){
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             jwt = authorizationHeader.substring(7);
         }
 
         //If not found in header, Check cookies
-        if(jwt == null){
+        if (jwt == null) {
             Cookie[] cookies = request.getCookies();
-            if(cookies!=null){
-                for(Cookie cookie: cookies){
-                    if("jwt".equals(cookie.getName())) {
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    if ("jwt".equals(cookie.getName())) {
                         jwt = cookie.getValue();
                         break;
                     }
@@ -81,6 +81,6 @@ public class JwtFilterRequest extends OncePerRequestFilter {
         }
 
 
-        filterChain.doFilter(request,response);
+        filterChain.doFilter(request, response);
     }
 }

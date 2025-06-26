@@ -26,32 +26,29 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-
 @RestController
 @RequiredArgsConstructor
-public class AuthController
-{
+public class AuthController {
 
     private final AuthenticationManager authenticationManager;
     private final AppUserDetailsService appUserDetailsService;
-    private  final JwtUtil jwtUtil;
-    private  final ProfileService profileService;
+    private final JwtUtil jwtUtil;
+    private final ProfileService profileService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody AuthRequest request)
-    {
+    public ResponseEntity<?> login(@RequestBody AuthRequest request) {
         try {
             authenticate(request.getEmail(), request.getPassword());
-            UserDetails userDetails=appUserDetailsService.loadUserByUsername(request.getEmail());
-         String jwttoken=  jwtUtil.generateToken(userDetails);
-            ResponseCookie cookie=ResponseCookie.from("jwt",jwttoken)
+            UserDetails userDetails = appUserDetailsService.loadUserByUsername(request.getEmail());
+            String jwttoken = jwtUtil.generateToken(userDetails);
+            ResponseCookie cookie = ResponseCookie.from("jwt", jwttoken)
                     .path("/")
                     .httpOnly(true)
                     .maxAge(Duration.ofDays(1))
                     .sameSite("Strict")
                     .build();
-            return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE,cookie.toString())
-                    .body(new AuthResponse(request.getEmail(),jwttoken));
+            return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString())
+                    .body(new AuthResponse(request.getEmail(), jwttoken));
 
 
         } catch (BadCredentialsException e) {
@@ -66,74 +63,62 @@ public class AuthController
 
 
     }
-    private ResponseEntity<Map<String, Object>> buildErrorResponse(String message, HttpStatus status)
-    {
+
+    private ResponseEntity<Map<String, Object>> buildErrorResponse(String message, HttpStatus status) {
         Map<String, Object> map = new HashMap<>();
         map.put("error", true);
         map.put("message", message);
         return ResponseEntity.status(status).body(map);
     }
 
-        private void authenticate (String email, String password)
-        {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
+    private void authenticate(String email, String password) {
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
+    }
+
+    @GetMapping("isAuthify")
+    public ResponseEntity<Boolean> isAuthenticated(@CurrentSecurityContext(expression = "authentication?.name") String email) {
+        return ResponseEntity.ok(email != null);
+    }
+
+    @PostMapping("/send-otp-email")
+    public void sendOtpEmail(@RequestParam String email) {
+        try {
+            profileService.sendOtp(email);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
-@GetMapping("isAuthify")
-public ResponseEntity<Boolean> isAuthenticated(@CurrentSecurityContext(expression = "authentication?.name") String email)
-{
-    return ResponseEntity.ok(email != null);
-}
-@PostMapping("/send-otp-email")
-public void sendOtpEmail(@RequestParam String email)
-{
-    try {
-        profileService.sendOtp(email);
-    }
-    catch (Exception e)
-    {
-        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,e.getMessage());
-    }
-}
-
-@PostMapping("reset-password")
-public void resetPasswordWithOtp(@RequestBody ResetPasswordRequest request)
-{
-    try
-    {
-      profileService.setPassowordWithOtp(request.getEmail(),request.getOtp(),request.getNewPassword());
-    }
-    catch (Exception e)
-    {
-        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,e.getMessage());
-    }
-}
-@PostMapping("/send-otp")
-public  void sendOtpToEmail(@CurrentSecurityContext(expression ="authentication?.name") String email)
-{
-    try
-    {
-        profileService.sendOtpToEmail(email);
-    }
-    catch (Exception e)
-    {
-        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"user not found ");
     }
 
+    @PostMapping("reset-password")
+    public void resetPasswordWithOtp(@RequestBody ResetPasswordRequest request) {
+        try {
+            profileService.setPassowordWithOtp(request.getEmail(), request.getOtp(), request.getNewPassword());
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
+    }
+
+    @PostMapping("/send-otp")
+    public void sendOtpToEmail(@CurrentSecurityContext(expression = "authentication?.name") String email) {
+        try {
+            profileService.sendOtpToEmail(email);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "user not found ");
+        }
+
+    }
+
+    @PostMapping("/verify-otp")
+    public void verifyEmail(@RequestBody Map<String, Object> map, @CurrentSecurityContext(expression = "authentication?.name") String email) {
+        if (map.get("otp").toString() == null) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "incorrect opt");
+        }
+        try {
+            profileService.verifyOtp(email, map.get("otp").toString());
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "account is not verified");
+        }
+    }
 }
-@PostMapping("/verify-otp")
-public  void verifyEmail(@RequestBody Map<String,Object> map, @CurrentSecurityContext(expression = "authentication?.name") String email)
-{
-    if (map.get("otp").toString()==null) {
-        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"incorrect opt");
-    }
-    try
-    {
-        profileService.verifyOtp(email,map.get("otp").toString());
-    }catch (Exception e)
-    {
-        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"account is not verified");
-    }
-}
-    }
 
 

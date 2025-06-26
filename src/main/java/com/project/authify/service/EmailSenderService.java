@@ -32,7 +32,7 @@ public class EmailSenderService
         message.setFrom(fromMail);
         message.setTo(email);
         message.setSubject("Password Reset OTP");
-        message.setText("Hi, "+"\n\n your OTP is "+otp +" you can use this OTP and reset your password");
+        message.setText("\n\n your OTP is "+otp +". you can use this OTP to reset your password");
         javaMailSender.send(message);
     }
     public  void verifyEmailOtp(String toEmail,String otp)
@@ -41,7 +41,7 @@ public class EmailSenderService
         message.setFrom(fromMail);
         message.setTo(toEmail);
         message.setSubject("Account verification OTP");
-        message.setText("verification code for Authify account :"+otp);
+        message.setText("Authify Account Verification Code :"+otp);
         javaMailSender.send(message);
     }
 }
