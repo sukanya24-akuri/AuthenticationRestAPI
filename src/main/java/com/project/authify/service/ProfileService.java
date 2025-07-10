@@ -38,14 +38,14 @@ public class ProfileService implements IProfileService {
     @Override
     public ProfileResponse getProfile(String email) {
         UserEntity existingUser = repo.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("user not found" + email));
+                .orElseThrow(() -> new UsernameNotFoundException("user not found read profile " + email));
         return convertToProfileResponse(existingUser);
     }
 
     @Override
     public void sendOtp(String email) {
         UserEntity existingUser = repo.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("user not found"));
-
+        System.out.println("User"+existingUser);
         //6 digit opt
         String otp = String.valueOf(ThreadLocalRandom.current().nextInt(100000, 1000000));
         //otp expiration
@@ -67,7 +67,7 @@ public class ProfileService implements IProfileService {
 
     @Override
     public void setPassowordWithOtp(String email, String otp, String newPassword) {
-        UserEntity existingUser = repo.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("user not found" + email));
+        UserEntity existingUser = repo.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("user not found (password)" + email));
         if (existingUser.getResetOtp() == null || !existingUser.getResetOtp().equals(otp)) {
             throw new RuntimeException("invalid otp");
         }
@@ -84,7 +84,7 @@ public class ProfileService implements IProfileService {
 
     @Override
     public void sendOtpToEmail(String email) {
-        UserEntity existingUser = repo.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("user not found " + email));
+        UserEntity existingUser = repo.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("user not found(unable to send otp) " + email));
         if (existingUser.getIsAccountverified() != null && existingUser.getIsAccountverified()) {
             return;
         }
