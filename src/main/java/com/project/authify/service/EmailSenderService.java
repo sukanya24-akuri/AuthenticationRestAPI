@@ -22,7 +22,7 @@ public class EmailSenderService
         message.setFrom(fromMail);
         message.setTo(toMail);
         message.setSubject("Welcome To Our Authify Platform");
-        message.setText("Hi, "+name+"\n\nThank you for Registration with us!\n\nBest Regards, \n Authify Team");
+        message.setText("Hi, "+name+"\n\nThank you for registering with us!\n\nYour account has been successfully created.\n\nBest Regards, \n Authify Team");
         javaMailSender.send(message);
     }
 
@@ -32,7 +32,7 @@ public class EmailSenderService
         message.setFrom(fromMail);
         message.setTo(email);
         message.setSubject("Password Reset OTP");
-        message.setText("\n\n your OTP is "+otp +". You can use this OTP to reset your password");
+        message.setText("Hi, "+"\n\nYour One-Time Password (OTP) is:  "+otp+"\n\nPlease use this OTP to reset your password"+"\n\nThank you,\n Authify Team");
         javaMailSender.send(message);
     }
     public  void verifyEmailOtp(String toEmail,String otp)
@@ -41,7 +41,7 @@ public class EmailSenderService
         message.setFrom(fromMail);
         message.setTo(toEmail);
         message.setSubject("Account verification Code");
-        message.setText("Your Authify Account Verification Code is :  "+otp);
+        message.setText("Hi, \n\nYour Authify Account Verification Code is :  "+otp+"\n\n Thank you.");
         javaMailSender.send(message);
     }
 }
