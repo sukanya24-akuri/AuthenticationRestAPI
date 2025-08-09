@@ -34,7 +34,6 @@ public class ProfileService implements IProfileService {
         throw new ResponseStatusException(HttpStatus.CONFLICT, "email already exists");
 
     }
-
     @Override
     public ProfileResponse getProfile(String email) {
         UserEntity existingUser = repo.findByEmail(email)

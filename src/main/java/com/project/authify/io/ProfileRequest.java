@@ -24,6 +24,6 @@ public class ProfileRequest
     @Email(message = "enter valid email")
     private String email;
 
-    @Size(min = 6,message = "password atleast 6 characters")
+    @Size(min = 4,message = "password atleast 4 characters")
     private String password;
 }

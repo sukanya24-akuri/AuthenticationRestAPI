@@ -1,7 +1,10 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Unnamed" type="Application" factoryName="Application" nameIsGenerated="true">
+  <configuration default="false" name="AuthifyApplication" type="Application" factoryName="Application" nameIsGenerated="true">
     <envs>
       <env name="MAIL_USERNAME" value="sukanyaakuri@gmail.com" />
+      <env name="PASSWORD" value="WJ28@krhps" />
+      <env name="MAIL_PASSWORD" value="NyTWJFO3YdQsaGMb" />
+      <env name="USERNAME" value="9057b5001@smtp-brevo.com" />
     </envs>
     <option name="MAIN_CLASS_NAME" value="com.project.authify.AuthifyApplication" />
     <module name="authify" />
